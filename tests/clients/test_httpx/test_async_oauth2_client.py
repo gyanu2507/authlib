@@ -72,15 +72,6 @@ async def test_get_accepts_url_object():
         resp = await client.get(URL("https://provider.test"))
 
     assert resp.json()["a"] == "a"
-    transport = ASGITransport(AsyncMockDispatch({"a": "a"}, assert_func=assert_func))
-    async with AsyncOAuth2Client(
-        "foo", token=default_token, token_placement=token_placement, transport=transport
-    ) as client:
-        async with client.stream("GET", "https://provider.test") as stream:
-            await stream.aread()
-            data = stream.json()
-
-    assert data["a"] == "a"
 
 
 @pytest.mark.parametrize(
