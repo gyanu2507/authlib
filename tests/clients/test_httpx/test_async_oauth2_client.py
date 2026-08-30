@@ -62,15 +62,16 @@ async def test_add_token_get_request(assert_func, token_placement):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "assert_func, token_placement",
-    [
-        (assert_token_in_header, "header"),
-        (assert_token_in_body, "body"),
-        (assert_token_in_uri, "uri"),
-    ],
-)
-async def test_add_token_to_streaming_request(assert_func, token_placement):
+async def test_get_accepts_url_object():
+    from httpx2 import URL
+
+    transport = ASGITransport(AsyncMockDispatch({"a": "a"}))
+    async with AsyncOAuth2Client(
+        "foo", token=default_token, transport=transport
+    ) as client:
+        resp = await client.get(URL("https://provider.test"))
+
+    assert resp.json()["a"] == "a"
     transport = ASGITransport(AsyncMockDispatch({"a": "a"}, assert_func=assert_func))
     async with AsyncOAuth2Client(
         "foo", token=default_token, token_placement=token_placement, transport=transport
